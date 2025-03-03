@@ -96,9 +96,8 @@ def main(*args):
     MainWindow.SynSegPivot_button.bind("<ButtonRelease-1>", MainWindow.pivot_popup)
     MainWindow.Main_img.bind("<ButtonPress-1>", Main_img_click)
 
-
-
-
+    # user should load a mask file at the beginning
+    LoadImg_click()
 
     root.mainloop()
 
@@ -435,11 +434,20 @@ def GenN_button_click(*args):
 
 def LoadImg_click(*args):
     # Open a file dialog to select an image file
-    filepath = filedialog.askopenfilename(filetypes=[("Image Files", "*.jpg *.png *.jpeg *.gif")])
+    filepath = filedialog.askopenfilename(title="Input a truth mask",
+                                          filetypes=[("Image Files", "*.jpg *.png *.jpeg *.gif")])
     if filepath:
         # If a file is selected, copy and rename it
         shutil.copy(filepath, "truth_mask.png")
-        print(f"File copied and renamed to: truth_mask.png")
+        print(f"Selected file loaded: {filepath}")
+
+    else:
+        # No file selected
+        if os.path.isfile("truth_mask.png"):  # previous truth mask exists
+            print(f"Use the previous truth mask.")
+        else:  # copy and rename the default one
+            shutil.copy("truth_mask_sample.png", "truth_mask.png")
+            print(f"Loaded the default mask: truth_mask_sample.png")
 
 
     # Load the binary mask image
