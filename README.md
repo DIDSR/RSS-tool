@@ -31,7 +31,7 @@ https://github.com/didsr/RSS-tool
   - Activate the installed Python environment.
   - Under the folder `RSS-tool`, run `RSS_GUI_main.py` file in Python: `python RSS_GUI_main.py`.
   
-    <img src="img/start_gui.png" width="500"/>
+    <img src="img/start_gui.png" width="300"/>
   
 * Use Command-line Functions
   - to be continued
