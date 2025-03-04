@@ -3,5 +3,5 @@
 
 ## Environment
 
-`RSS-tool` was developed and tested in Python 3.8, it depends packages of the environment listed in [environment.txt](environment.txt).
+`RSS-tool` was developed and tested in Python 3.8, it depends on packages of the environment listed in [environment.txt](environment.txt).
 
