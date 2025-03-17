@@ -679,7 +679,6 @@ def UserFusion_button_click(*args):
     # just for tests
     folder_in = "/home/shuyue.guan/Documents/datasets/RSS-tool/UserSyn_out/"
     folder_out = "/home/shuyue.guan/Documents/datasets/RSS-tool/UserFusion_out/"
-
     # folder_in = "UserFusion_in/"
     # folder_out = "UserFusion_out/"
 
@@ -710,9 +709,8 @@ def UserFusion_button_click(*args):
 
 def UserSyn_button_click(*args):
     # just for tests
-    mask_folder = "UserSyn_in/"
-    output_folder = "UserSyn_out/"
-
+    mask_folder = "/home/shuyue.guan/Documents/datasets/RSS-tool/UserSyn_in/"
+    output_folder = "/home/shuyue.guan/Documents/datasets/RSS-tool/UserSyn_out/"
     # mask_folder = "UserSyn_in/"
     # output_folder = "UserSyn_out/"
 
