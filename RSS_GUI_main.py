@@ -676,10 +676,17 @@ def SelectMode_Click(*args):
 
 def UserFusion_button_click(*args):
 
-    for folder_name in tqdm(os.listdir("UserFusion_in/")):
-        folder_path = os.path.join("UserFusion_in/", folder_name)
+    # just for tests
+    folder_in = "/home/shuyue.guan/Documents/datasets/RSS-tool/UserSyn_out/"
+    folder_out = "/home/shuyue.guan/Documents/datasets/RSS-tool/UserFusion_out/"
+
+    # folder_in = "UserFusion_in/"
+    # folder_out = "UserFusion_out/"
+
+    for folder_name in tqdm(os.listdir(folder_in)):
+        folder_path = os.path.join(folder_in, folder_name)
         fused_folder_name = f"{folder_name}_fusion"
-        fused_folder_path = os.path.join("UserFusion_out/", fused_folder_name)
+        fused_folder_path = os.path.join(folder_out, fused_folder_name)
 
         if not os.path.exists(fused_folder_path):
             os.makedirs(fused_folder_path)
@@ -702,8 +709,12 @@ def UserFusion_button_click(*args):
         sys.stdout.flush()
 
 def UserSyn_button_click(*args):
+    # just for tests
     mask_folder = "UserSyn_in/"
     output_folder = "UserSyn_out/"
+
+    # mask_folder = "UserSyn_in/"
+    # output_folder = "UserSyn_out/"
 
     while True:
         USER_INP = simpledialog.askinteger(title="Gen N SynSegs from every user's masks",
