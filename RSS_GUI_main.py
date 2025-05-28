@@ -83,6 +83,15 @@ def main(*args):
     MainWindow.SelectFrom_value.set(0.93)
     MainWindow.SelectTo_value.set(0.95)
 
+    ## disable some functions
+    MainWindow.Syn_view_radiobutton.configure(state = "disabled")
+    MainWindow.Overlay_view_radiobutton.configure(state="disabled")
+
+    MainWindow.DispASynSeg_button.configure(state="disabled")
+    MainWindow.SynSegPivot_button.configure(state="disabled")
+    MainWindow.DispFusion_button.configure(state="disabled")
+
+
 
     ## set functions
     _top1.resizable(width=False, height=False)  # fixed window
@@ -92,8 +101,8 @@ def main(*args):
 
     MainWindow.LF_entry.bind("<ButtonPress-1>", LF_entry_click)
     MainWindow.HF_entry.bind("<ButtonPress-1>", HF_entry_click)
-    MainWindow.DispFusion_button.bind("<ButtonRelease-1>", MainWindow.fusion_popup)
-    MainWindow.SynSegPivot_button.bind("<ButtonRelease-1>", MainWindow.pivot_popup)
+    # MainWindow.DispFusion_button.bind("<ButtonRelease-1>", MainWindow.fusion_popup)
+    # MainWindow.SynSegPivot_button.bind("<ButtonRelease-1>", MainWindow.pivot_popup)
     MainWindow.Main_img.bind("<ButtonPress-1>", Main_img_click)
 
     # user should load a mask file at the beginning
@@ -212,6 +221,14 @@ def gen_synseg(num):
 
             if eligible:
                 cv2.imwrite("SynSegs/synseg_%d_.png" % i, syn_img * 255)
+
+                # Enable display buttons after successful running
+                MainWindow.DispASynSeg_button.configure(state="normal")
+                MainWindow.SynSegPivot_button.configure(state="normal")
+                MainWindow.DispFusion_button.configure(state="normal")
+                MainWindow.DispFusion_button.bind("<ButtonRelease-1>", MainWindow.fusion_popup)
+                MainWindow.SynSegPivot_button.bind("<ButtonRelease-1>", MainWindow.pivot_popup)
+
                 break
 
             else:
@@ -249,6 +266,14 @@ def gen_synseg_selet(num, metric_func, From, To):
 
                 if score > From and score < To:
                     cv2.imwrite("SynSegs/synseg_%d_.png" % i, syn_img * 255)
+
+                    # Enable display buttons after successful running
+                    MainWindow.DispASynSeg_button.configure(state="normal")
+                    MainWindow.SynSegPivot_button.configure(state="normal")
+                    MainWindow.DispFusion_button.configure(state="normal")
+                    MainWindow.DispFusion_button.bind("<ButtonRelease-1>", MainWindow.fusion_popup)
+                    MainWindow.SynSegPivot_button.bind("<ButtonRelease-1>", MainWindow.pivot_popup)
+
                     break
 
                 else:  # try for selestion
@@ -309,6 +334,11 @@ def sample_display(truth_file, seg_file):
     MainWindow.Metrics_listbox.insert(END, "JAC:" + str(round(JAC(truth_img, seg_img), 5)))
     MainWindow.Metrics_listbox.insert(END, "HD:" + str(round(HD(truth_img, seg_img), 5)))
     MainWindow.Metrics_listbox.insert(END, "MSI:" + str(round(MSI(truth_img, seg_img), 5)))
+
+
+    # Enable display buttons after successful running
+    MainWindow.Syn_view_radiobutton.configure(state = "normal")
+    MainWindow.Overlay_view_radiobutton.configure(state="normal")
 
     ## display images
     refresh_display(MainWindow.opt_var.get())
@@ -433,13 +463,17 @@ def GenN_button_click(*args):
 
 
 def LoadImg_click(*args):
+
     # Open a file dialog to select an image file
     filepath = filedialog.askopenfilename(title="Input a truth mask",
                                           filetypes=[("Image Files", "*.jpg *.png *.jpeg *.gif")])
     if filepath:
-        # If a file is selected, copy and rename it
-        shutil.copy(filepath, "truth_mask.png")
-        print(f"Selected file loaded: {filepath}")
+        if os.path.isfile("truth_mask.png"):  # previous truth mask exists
+            print(f"Use the previous truth mask.")
+        else:
+            # If a file is selected, copy and rename it
+            shutil.copy(filepath, "truth_mask.png")
+            print(f"Selected file loaded: {filepath}")
 
     else:
         # No file selected
@@ -674,31 +708,50 @@ def SelectMode_Click(*args):
             print ('    another arg:', arg)
         sys.stdout.flush()
 
-def UserFusion_button_click(*args):
 
-    # just for tests
-    folder_in = "/home/shuyue.guan/Documents/datasets/RSS-tool/UserSyn_out/"
-    folder_out = "/home/shuyue.guan/Documents/datasets/RSS-tool/UserFusion_out/"
+# Function to read configurations from a file
+def load_config(file_path):
+    config_dict = {}
+    with open(file_path, 'r') as file:
+        for line in file:
+            item, value = line.strip().split('=')
+            config_dict[item] = value
+    return config_dict
+
+def UserFusion_button_click(*args):
+    # Load the config file
+    batch_config = load_config("batch_processing_config.txt")
+    folder_in = batch_config["UserFusion_folder_in"]
+    folder_out = batch_config["UserFusion_folder_out"]
+
     # folder_in = "UserFusion_in/"
     # folder_out = "UserFusion_out/"
 
-    for folder_name in tqdm(os.listdir(folder_in)):
-        folder_path = os.path.join(folder_in, folder_name)
-        fused_folder_name = f"{folder_name}_fusion"
-        fused_folder_path = os.path.join(folder_out, fused_folder_name)
+    response =  tk.messagebox.askyesno("Batch Processing: User Fusion", "Masks in each sub-folder under the folder: " + folder_in
+                                     + "\t\t\t\t \n will be fused by different truthing methods and saved in the folder: "+ folder_out + ".\t\t\t\t \n Fused masks from the same sub-folder are in one folder. " +
+                                                                                    "\t\t\t\t \n To customize the input/output folders, please edit the <batch_processing_config.txt>. " +
+                                     "\t\t\t\t \n Changes will be applied next time. Continue? \t\t\t\t")
 
-        if not os.path.exists(fused_folder_path):
-            os.makedirs(fused_folder_path)
-        else:
-            shutil.rmtree(fused_folder_path)
-            os.makedirs(fused_folder_path)
+    if response:
+        # User selected Yes
 
-        # print(fused_folder_path)
+        for folder_name in tqdm(os.listdir(folder_in)):
+            folder_path = os.path.join(folder_in, folder_name)
+            fused_folder_name = f"{folder_name}_fusion"
+            fused_folder_path = os.path.join(folder_out, fused_folder_name)
+
+            if not os.path.exists(fused_folder_path):
+                os.makedirs(fused_folder_path)
+            else:
+                shutil.rmtree(fused_folder_path)
+                os.makedirs(fused_folder_path)
+
+            # print(fused_folder_path)
 
 
-        Fusion_MV(MaskFolder=folder_path, output_folder = fused_folder_path)
-        Fusion_STAPLE(MaskFolder=folder_path, output_folder = fused_folder_path)
-        Fusion_TESD(MaskFolder=folder_path, output_folder = fused_folder_path)
+            Fusion_MV(MaskFolder=folder_path, output_folder = fused_folder_path)
+            Fusion_STAPLE(MaskFolder=folder_path, output_folder = fused_folder_path)
+            Fusion_TESD(MaskFolder=folder_path, output_folder = fused_folder_path)
 
 
     if _debug:
@@ -707,31 +760,54 @@ def UserFusion_button_click(*args):
             print ('    another arg:', arg)
         sys.stdout.flush()
 
+
+# Function to save configurations to a file
+# def save_config(file_path, config_dict):
+#     with open(file_path, 'w') as file:
+#         for item, value in config_dict.items():
+#             file.write(f"{item}={value}\n")
 def UserSyn_button_click(*args):
-    # just for tests
-    mask_folder = "/home/shuyue.guan/Documents/datasets/RSS-tool/UserSyn_in/"
-    output_folder = "/home/shuyue.guan/Documents/datasets/RSS-tool/UserSyn_out/"
+    # Load the config file
+    batch_config = load_config("batch_processing_config.txt")
+    mask_folder = batch_config["UserSyn_mask_folder"]
+    output_folder = batch_config["UserSyn_output_folder"]
+
+    response =  tk.messagebox.askyesno("Batch Processing: User Synthesis", "N (to be asked later) SynSegs will be generated from each original mask in the folder: " + mask_folder
+                                     + "\t\t\t\t \n and saved in the folder: "+ output_folder + ".\t\t\t\t \n SynSegs generated from the same original mask are in one folder. " +
+                                                                                    "\t\t\t\t \n To customize the input/output folders, please edit the <batch_processing_config.txt>. " +
+                                     "\t\t\t\t \n Changes will be applied next time. Continue? \t\t\t\t")
+
     # mask_folder = "UserSyn_in/"
     # output_folder = "UserSyn_out/"
 
-    while True:
-        USER_INP = simpledialog.askinteger(title="Gen N SynSegs from every user's masks",
-                                           prompt="Input the number of SynSegs (N) for generation:\t\t",
-                                           initialvalue=3)
-        if USER_INP != None:  # not a None
+    # configurations = {"UserSyn_mask_folder": mask_folder,
+    #                   "UserSyn_output_folder": output_folder}
+    # file_path = "batch_processing_config.txt"
+    # # Save to file
+    # save_config(file_path, configurations)
 
-            if USER_INP > 0:
-                mask_augmentation(mask_folder, output_folder, times=USER_INP,
-                                  l=int(MainWindow.LF_value.get()),
-                                  h=int(MainWindow.HF_value.get()),
-                                  sigma=float(MainWindow.Sigma_value.get()))
+
+    if response:
+        # User selected Yes
+
+        while True:
+            USER_INP = simpledialog.askinteger(title="Gen N SynSegs from every user's masks",
+                                               prompt="Input the number of SynSegs (N) for generation:\t\t",
+                                               initialvalue=3)
+            if USER_INP != None:  # not a None
+
+                if USER_INP > 0:
+                    mask_augmentation(mask_folder, output_folder, times=USER_INP,
+                                      l=int(MainWindow.LF_value.get()),
+                                      h=int(MainWindow.HF_value.get()),
+                                      sigma=float(MainWindow.Sigma_value.get()))
+                    break
+                else:
+                    messagebox.showinfo(title="Error",
+                                        message="The number cannot be smaller than 1")
+
+            else:  # click "cancel"
                 break
-            else:
-                messagebox.showinfo(title="Error",
-                                    message="The number cannot be smaller than 1")
-
-        else:  # click "cancel"
-            break
 
 
     if _debug:

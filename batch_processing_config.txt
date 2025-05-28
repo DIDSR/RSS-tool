@@ -1,0 +1,4 @@
+UserSyn_mask_folder=UserSyn_in/
+UserSyn_output_folder=UserSyn_out/
+UserFusion_folder_in=UserFusion_in/
+UserFusion_folder_out=UserFusion_out/
