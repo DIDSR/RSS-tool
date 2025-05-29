@@ -31,7 +31,8 @@ _debug = True # False to eliminate debug printing from callback functions.
 
 def main(*args):
     '''Main entry point for the application.'''
-    global root
+    global root, rndSeed
+    rndSeed = -1
     root = tk.Tk()
     root.protocol( 'WM_DELETE_WINDOW' , root.destroy)
     print("Start-up!")
@@ -205,6 +206,12 @@ def refresh_display(opt):
         root.mainloop()
 
 def gen_synseg(num):
+    global rndSeed
+    if rndSeed!=-1:
+        np.random.seed(rndSeed)
+    else:
+        np.random.seed(None)
+
     for i in tqdm(range(1,num+1)):  # gen num SynSegs
         try_times = 0
         while True:
@@ -244,6 +251,12 @@ def gen_synseg(num):
                 #       + "/100 times or stop to set different params.")
 
 def gen_synseg_selet(num, metric_func, From, To):
+    global rndSeed
+    if rndSeed!=-1:
+        np.random.seed(rndSeed)
+    else:
+        np.random.seed(None)
+
     for i in tqdm(range(1,num+1)):  # gen num SynSegs
         try_times_mask = 0
         try_times_selet = 0
@@ -348,6 +361,13 @@ def sample_display(truth_file, seg_file):
 
 def Gen1_button_click(*args):
     fd_code = bd2Fdesc(mask)
+
+    global rndSeed
+    if rndSeed!=-1:
+        np.random.seed(rndSeed)
+    else:
+        np.random.seed(None)
+
     CFcode = FD_change(fd_code,
                        l=int(MainWindow.LF_value.get()),
                        h=int(MainWindow.HF_value.get()),
@@ -415,6 +435,16 @@ def Gen1_button_click(*args):
 
 
 def GenN_button_click(*args):
+    global rndSeed
+    if rndSeed!=-1:
+        response = tk.messagebox.askyesno("Random seed set = "+str(rndSeed),
+                                          "\t\t\t\t\nA random seed is set; generation results will be fixed and depended on the seed."  +
+                                          "\t\t\t\t \nTo change or remove the random seed, click <Seed> button."
+                                          "\t\t\t\t \nContinue? \t\t\t\t")
+        if response == False:
+            return
+
+
     if MainWindow.SelectMode_value.get():
         the_title = "Gen N **in Selection Mode**"
     else:
@@ -767,6 +797,15 @@ def UserFusion_button_click(*args):
 #         for item, value in config_dict.items():
 #             file.write(f"{item}={value}\n")
 def UserSyn_button_click(*args):
+    global rndSeed
+    if rndSeed!=-1:
+        answer = tk.messagebox.askyesno("Random seed set = "+str(rndSeed),
+                                          "\t\t\t\t\nA random seed is set; generation results will be fixed and depended on the seed."  +
+                                          "\t\t\t\t \nTo change or remove the random seed, click <Seed> button."
+                                          "\t\t\t\t \nContinue? \t\t\t\t")
+        if answer == False:
+            return
+
     # Load the config file
     batch_config = load_config("batch_processing_config.txt")
     mask_folder = batch_config["UserSyn_mask_folder"]
@@ -800,7 +839,8 @@ def UserSyn_button_click(*args):
                     mask_augmentation(mask_folder, output_folder, times=USER_INP,
                                       l=int(MainWindow.LF_value.get()),
                                       h=int(MainWindow.HF_value.get()),
-                                      sigma=float(MainWindow.Sigma_value.get()))
+                                      sigma=float(MainWindow.Sigma_value.get()),
+                                      rndSeed = rndSeed)
                     break
                 else:
                     messagebox.showinfo(title="Error",
@@ -816,6 +856,36 @@ def UserSyn_button_click(*args):
             print ('    another arg:', arg)
         sys.stdout.flush()
 
+
+def Seed_button_click(*args):
+    global rndSeed
+    # print("before: "+ str(rndSeed))
+
+    while True:
+        USER_INP = simpledialog.askinteger(title="Advanced function: set the random seed",
+                                           prompt="A reasonable seed must be an integer between 0 and (2^32 - 1). Only input -1 for no random seed. \nIf you set a random seed, generation results will be fixed and depended on the seed number.",
+                                           initialvalue=rndSeed)
+        if USER_INP != None:  # check if click cancel
+            if USER_INP != -1:  # not a None
+                if 0 <= USER_INP <= 2**32 - 1:  # in correct range?
+                    rndSeed = USER_INP
+                    break
+                else:
+                    messagebox.showinfo(title="Error", message="Seed must be between 0 and (2^32 - 1).")
+            else:
+                rndSeed = -1 # None - keep None
+                print("No random seed set.")
+                break
+        else: # click "cancel" - no change
+            break
+
+    # print("after: "+ str(rndSeed))
+
+    if _debug:
+        print('RSS_GUI_main.Seed_button_click')
+        for arg in args:
+            print ('    another arg:', arg)
+        sys.stdout.flush()
 
 if __name__ == '__main__':
     RSS_GUI_layout.start_up()

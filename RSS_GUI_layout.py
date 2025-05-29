@@ -81,10 +81,18 @@ class MainWin:
         self.Sigma_label.configure(text='''Sigma:''')
 
         self.Sigma_entry = tk.Entry(self.top)
-        self.Sigma_entry.place(x=0.033*w, y=0.628*h, height=29, width=0.158*w)
+        self.Sigma_entry.place(x=0.033*w, y=0.628*h, height=29, width=0.09*w)
         self.Sigma_entry.configure(background="white")
         self.Sigma_entry.configure(font="-family {nimbus mono l} -size 12")
         self.Sigma_entry.configure(selectbackground="#d9d9d9")
+
+        self.Seed_button = tk.Button(self.top)
+        self.Seed_button.place(x=0.14*w, y=0.628*h, height=29, width=50)
+        self.Seed_button.configure(activebackground="#d9d9d9")
+        self.Seed_button.configure(command=RSS_GUI_main.Seed_button_click)
+        self.Seed_button.configure(cursor="fleur")
+        self.Seed_button.configure(font="-family {nimbus sans l} -size 9")
+        self.Seed_button.configure(text='''Seed''')
 
         self.View_label = tk.Label(self.top)
         self.View_label.place(x=0.388*w, y=0.005*h, height=19, width=79)

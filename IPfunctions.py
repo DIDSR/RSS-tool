@@ -145,7 +145,13 @@ def contour2mask(contour):
     return filled, eligible_flag
 
 
-def mask_augmentation(mask_folder, output_folder, times, l, h, sigma):
+def mask_augmentation(mask_folder, output_folder, times, l, h, sigma, rndSeed):
+
+    if rndSeed!=-1:
+        np.random.seed(rndSeed)
+    else:
+        np.random.seed(None)
+
     for mask_file in tqdm(os.listdir(mask_folder)):
 
         name, ext = os.path.splitext(mask_file)
