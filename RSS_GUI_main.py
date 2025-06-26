@@ -497,13 +497,19 @@ def LoadImg_click(*args):
     # Open a file dialog to select an image file
     filepath = filedialog.askopenfilename(title="Input a truth mask",
                                           filetypes=[("Image Files", "*.jpg *.png *.jpeg *.gif")])
+    # print (filepath)
     if filepath:
-        if os.path.isfile("truth_mask.png"):  # previous truth mask exists
-            print(f"Use the previous truth mask.")
-        else:
+        # if os.path.isfile("truth_mask.png"):  # previous truth mask exists
+        #     print(f"Use the previous truth mask.")
+        # else:
+        try:
             # If a file is selected, copy and rename it
             shutil.copy(filepath, "truth_mask.png")
             print(f"Selected file loaded: {filepath}")
+
+        except Exception as e:
+            print(e)
+            print(f"Use the previous truth mask.")
 
     else:
         # No file selected
