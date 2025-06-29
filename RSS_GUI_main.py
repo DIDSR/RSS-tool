@@ -26,7 +26,7 @@ import SimpleITK as sitk
 
 import RSS_GUI_layout
 
-_debug = True # False to eliminate debug printing from callback functions.
+_debug = True  # False to eliminate debug printing from callback functions.
 
 
 def main(*args):
@@ -34,7 +34,7 @@ def main(*args):
     global root, rndSeed
     rndSeed = -1
     root = tk.Tk()
-    root.protocol( 'WM_DELETE_WINDOW' , root.destroy)
+    root.protocol('WM_DELETE_WINDOW', root.destroy)
     print("Start-up!")
     # Creates a toplevel widget.
     global _top1, MainWindow, MaskFolder4Fusion
@@ -43,7 +43,6 @@ def main(*args):
     MaskFolder4Fusion = "SynSegs/"
 
     ## init events
-
 
     MainWindow.Sigma_value = tk.StringVar()
     MainWindow.Sigma_entry.configure(textvariable=MainWindow.Sigma_value)
@@ -73,7 +72,6 @@ def main(*args):
     MainWindow.SelectTo_value = tk.StringVar()
     MainWindow.SelectTo_entry.configure(textvariable=MainWindow.SelectTo_value)
 
-
     ## set default values
     MainWindow.Sigma_value.set(1)
     MainWindow.LF_scale.configure(from_=0)
@@ -85,14 +83,12 @@ def main(*args):
     MainWindow.SelectTo_value.set(0.95)
 
     ## disable some functions
-    MainWindow.Syn_view_radiobutton.configure(state = "disabled")
+    MainWindow.Syn_view_radiobutton.configure(state="disabled")
     MainWindow.Overlay_view_radiobutton.configure(state="disabled")
 
     MainWindow.DispASynSeg_button.configure(state="disabled")
     MainWindow.SynSegPivot_button.configure(state="disabled")
     MainWindow.DispFusion_button.configure(state="disabled")
-
-
 
     ## set functions
     _top1.resizable(width=False, height=False)  # fixed window
@@ -111,12 +107,13 @@ def main(*args):
 
     root.mainloop()
 
+
 def LF_entry_click(event):
     # print("clicked!")
     while True:
         USER_INP = simpledialog.askinteger(title="Value Input",
-                                          prompt="Input the value for Low Frequency:",
-                                        initialvalue=MainWindow.LF_value.get())
+                                           prompt="Input the value for Low Frequency:",
+                                           initialvalue=MainWindow.LF_value.get())
         if USER_INP != None:  # not a None
             if USER_INP < int(MainWindow.HF_value.get()):
                 if USER_INP > -1:
@@ -129,9 +126,11 @@ def LF_entry_click(event):
 
             else:
                 messagebox.showinfo(title="Error",
-                                    message="Low Frequency must be smaller than High Frequency: " + str(MainWindow.HF_value.get()))
+                                    message="Low Frequency must be smaller than High Frequency: " + str(
+                                        MainWindow.HF_value.get()))
         else:  # click "cancel"
             break
+
 
 def HF_entry_click(event):
     # print("clicked!")
@@ -151,7 +150,8 @@ def HF_entry_click(event):
 
             else:
                 messagebox.showinfo(title="Error",
-                                    message="High Frequency must be greater than Low Frequency: " + str(MainWindow.LF_value.get()))
+                                    message="High Frequency must be greater than Low Frequency: " + str(
+                                        MainWindow.LF_value.get()))
         else:  # click "cancel"
             break
 
@@ -169,7 +169,6 @@ def Main_img_click(event):
     elif opt == 3:
         img = Image.open("overlay_display.png")
 
-
     plt.imshow(img, cmap='gray')
     plt.show()
 
@@ -185,34 +184,36 @@ def refresh_scale():
     MainWindow.LF_scale.set(MainWindow.LF_value.get())
     MainWindow.HF_scale.set(MainWindow.HF_value.get())
 
+
 def refresh_display(opt):
-    if opt==1:
+    if opt == 1:
         img = Image.open("T_mask.png")
         resized_image = img.resize((300, 300), Image.ANTIALIAS)
         new_image = ImageTk.PhotoImage(resized_image)
         MainWindow.Main_img.create_image(0, 0, anchor=tk.NW, image=new_image)
         root.mainloop()
-    elif opt==2:
+    elif opt == 2:
         img = Image.open("S_mask.png")
         resized_image = img.resize((300, 300), Image.ANTIALIAS)
         new_image = ImageTk.PhotoImage(resized_image)
         MainWindow.Main_img.create_image(0, 0, anchor=tk.NW, image=new_image)
         root.mainloop()
-    elif opt==3:
+    elif opt == 3:
         img = Image.open("overlay_display.png")
         resized_image = img.resize((300, 300), Image.ANTIALIAS)
         new_image = ImageTk.PhotoImage(resized_image)
         MainWindow.Main_img.create_image(0, 0, anchor=tk.NW, image=new_image)
         root.mainloop()
 
-def gen_synseg(num):
-    global rndSeed
-    if rndSeed!=-1:
-        np.random.seed(rndSeed)
-    else:
-        np.random.seed(None)
 
-    for i in tqdm(range(1,num+1)):  # gen num SynSegs
+def gen_synseg(num):
+    # global rndSeed
+    # if rndSeed!=-1:
+    #     np.random.seed(rndSeed)
+    # else:
+    #     np.random.seed(None)
+
+    for i in tqdm(range(1, num + 1)):  # gen num SynSegs
         try_times = 0
         while True:
             fd_code = bd2Fdesc(mask)
@@ -223,8 +224,6 @@ def gen_synseg(num):
 
             re_img = Fdesc2bd(CFcode, mask.shape)
             syn_img, eligible = contour2mask(re_img)
-
-
 
             if eligible:
                 cv2.imwrite("SynSegs/synseg_%d_.png" % i, syn_img * 255)
@@ -239,25 +238,27 @@ def gen_synseg(num):
                 break
 
             else:
-                try_times +=1
-                if try_times>99:  # try 100 times
+                try_times += 1
+                if try_times > 99:  # try 100 times
                     print("Task unsuccessful: cannot create an eligible mask for " + str(try_times)
                           + " times trying in a least one round, need to set different params.")
-                    tk.messagebox.showwarning("Task unsuccessful", "Cannot create an eligible mask for " + str(try_times)
-                          + " times trying in a least one round, need to set different params.")
+                    tk.messagebox.showwarning("Task unsuccessful",
+                                              "Cannot create an eligible mask for " + str(try_times)
+                                              + " times trying in a least one round, need to set different params.")
                     return
 
                 # print("Cannot create an eligible mask, tried " + str(try_times)
                 #       + "/100 times or stop to set different params.")
 
-def gen_synseg_selet(num, metric_func, From, To):
-    global rndSeed
-    if rndSeed!=-1:
-        np.random.seed(rndSeed)
-    else:
-        np.random.seed(None)
 
-    for i in tqdm(range(1,num+1)):  # gen num SynSegs
+def gen_synseg_selet(num, metric_func, From, To):
+    # global rndSeed
+    # if rndSeed!=-1:
+    #     np.random.seed(rndSeed)
+    # else:
+    #     np.random.seed(None)
+
+    for i in tqdm(range(1, num + 1)):  # gen num SynSegs
         try_times_mask = 0
         try_times_selet = 0
         while True:
@@ -269,8 +270,6 @@ def gen_synseg_selet(num, metric_func, From, To):
 
             re_img = Fdesc2bd(CFcode, mask.shape)
             syn_img, eligible = contour2mask(re_img)
-
-
 
             if eligible:
                 try_times_mask = 0
@@ -292,25 +291,26 @@ def gen_synseg_selet(num, metric_func, From, To):
                 else:  # try for selestion
                     try_times_selet += 1
                     if try_times_selet > 199:  # try 200 times
-                        print("Segmentation selection unsuccessful: cannot create a required mask for " + str(try_times_selet)
+                        print("Segmentation selection unsuccessful: cannot create a required mask for " + str(
+                            try_times_selet)
                               + " times trying in a least one round, need to set a different selection metric.")
                         tk.messagebox.showwarning("Segmentation selection unsuccessful",
                                                   "Cannot create a required mask for " + str(try_times_selet)
                                                   + " times trying in a least one round, need to set a different selection metric.")
                         return
 
-                    # print("Cannot create a required mask, tried " + str(try_times_selet)
-                    #       + "/200 times or stop to set a different selection metric.")
-
-
+                    print("The mask is not in the selection, tried " + str(try_times_selet) +
+                          "/200 times or stop to set a different selection metric.", end="\r",
+                          flush=True)
 
             else:  # try for eligible syn_mask
-                try_times_mask +=1
-                if try_times_mask>99:  # try 100 times
+                try_times_mask += 1
+                if try_times_mask > 99:  # try 100 times
                     print("Task unsuccessful: cannot create an eligible mask for " + str(try_times_mask)
                           + " times trying in a least one round, need to set different params.")
-                    tk.messagebox.showwarning("Task unsuccessful", "Cannot create an eligible mask for " + str(try_times_mask)
-                          + " times trying in a least one round, need to set different params.")
+                    tk.messagebox.showwarning("Task unsuccessful",
+                                              "Cannot create an eligible mask for " + str(try_times_mask)
+                                              + " times trying in a least one round, need to set different params.")
                     return
 
                 # print("Cannot create an eligible mask, tried " + str(try_times_mask)
@@ -332,9 +332,9 @@ def sample_display(truth_file, seg_file):
     # Draw contours on a blank image
     contour_image = np.zeros_like(seg_img)
     cv2.drawContours(contour_image, contours, -1, (255, 255, 255), 1)
-    k=3
-    overlay = (contour_image/255)*k+(truth_img/255)
-    overlay[overlay==k+1]=k
+    k = 3
+    overlay = (contour_image / 255) * k + (truth_img / 255)
+    overlay[overlay == k + 1] = k
     plt.figure(frameon=False)
     plt.axis('off')
     plt.imshow(overlay, interpolation='none')
@@ -342,15 +342,14 @@ def sample_display(truth_file, seg_file):
     plt.close()
 
     ## display metrics btw seg_img and truth_img
-    MainWindow.Metrics_listbox.delete(0,99)  # refresh the list
-    MainWindow.Metrics_listbox.insert(END, "Dice:"+ str(round(DICE(truth_img,seg_img),5)))
+    MainWindow.Metrics_listbox.delete(0, 99)  # refresh the list
+    MainWindow.Metrics_listbox.insert(END, "Dice:" + str(round(DICE(truth_img, seg_img), 5)))
     MainWindow.Metrics_listbox.insert(END, "JAC:" + str(round(JAC(truth_img, seg_img), 5)))
     MainWindow.Metrics_listbox.insert(END, "HD:" + str(round(HD(truth_img, seg_img), 5)))
     MainWindow.Metrics_listbox.insert(END, "MSI:" + str(round(MSI(truth_img, seg_img), 5)))
 
-
     # Enable display buttons after successful running
-    MainWindow.Syn_view_radiobutton.configure(state = "normal")
+    MainWindow.Syn_view_radiobutton.configure(state="normal")
     MainWindow.Overlay_view_radiobutton.configure(state="normal")
 
     ## display images
@@ -362,11 +361,11 @@ def sample_display(truth_file, seg_file):
 def Gen1_button_click(*args):
     fd_code = bd2Fdesc(mask)
 
-    global rndSeed
-    if rndSeed!=-1:
-        np.random.seed(rndSeed)
-    else:
-        np.random.seed(None)
+    # global rndSeed
+    # if rndSeed!=-1:
+    #     np.random.seed(rndSeed)
+    # else:
+    #     np.random.seed(None)
 
     CFcode = FD_change(fd_code,
                        l=int(MainWindow.LF_value.get()),
@@ -377,14 +376,13 @@ def Gen1_button_click(*args):
     # cv2.imwrite("_temp.png", re_img * 255)
     syn_img, eligible = contour2mask(re_img)
 
-
     if not eligible:
         print("Cannot create an eligible mask, try again or set different params.")
         return
 
     # print(syn_img)
     # Converts bool to integer, which gives 0 for False and 1 for True, and multiplies it by 255 to make a (bit-)mask before writing it.
-    cv2.imwrite("syn_mask.png",syn_img*255)
+    cv2.imwrite("syn_mask.png", syn_img * 255)
 
     '''
     
@@ -425,25 +423,23 @@ def Gen1_button_click(*args):
 
     root.mainloop()
 
-
     # print(MainWindow.Sigma_value.get())
     if _debug:
         print('RSS_GUI_main.Apply_button_click')
         for arg in args:
-            print ('    another arg:', arg)
+            print('    another arg:', arg)
         sys.stdout.flush()
 
 
 def GenN_button_click(*args):
     global rndSeed
-    if rndSeed!=-1:
-        response = tk.messagebox.askyesno("Random seed set = "+str(rndSeed),
-                                          "\t\t\t\t\nA random seed is set; generation results will be fixed and depended on the seed."  +
+    if rndSeed != -1:
+        response = tk.messagebox.askyesno("Random seed = " + str(rndSeed),
+                                          "\t\t\t\t\nA random seed is fixed; the sequence of random values will be fixed and depended on the seed until the seed reset or the program restarted." +
                                           "\t\t\t\t \nTo change or remove the random seed, click <Seed> button."
                                           "\t\t\t\t \nContinue? \t\t\t\t")
         if response == False:
             return
-
 
     if MainWindow.SelectMode_value.get():
         the_title = "Gen N **in Selection Mode**"
@@ -493,7 +489,6 @@ def GenN_button_click(*args):
 
 
 def LoadImg_click(*args):
-
     # Open a file dialog to select an image file
     filepath = filedialog.askopenfilename(title="Input a truth mask",
                                           filetypes=[("Image Files", "*.jpg *.png *.jpeg *.gif")])
@@ -519,7 +514,6 @@ def LoadImg_click(*args):
             shutil.copy("truth_mask_sample.png", "truth_mask.png")
             print(f"Loaded the default mask: truth_mask_sample.png")
 
-
     # Load the binary mask image
     # Load an image in the script
     img = cv2.imread("truth_mask.png", cv2.IMREAD_GRAYSCALE)
@@ -534,7 +528,7 @@ def LoadImg_click(*args):
 
     Max_value = Len // 2
 
-    MainWindow.LF_scale.configure(to=Max_value-1)
+    MainWindow.LF_scale.configure(to=Max_value - 1)
     MainWindow.LF_value.set(2)
 
     MainWindow.HF_scale.configure(to=Max_value)
@@ -557,8 +551,9 @@ def LoadImg_click(*args):
     if _debug:
         print('RSS_GUI_main.LoadImg_click')
         for arg in args:
-            print ('    another arg:', arg)
+            print('    another arg:', arg)
         sys.stdout.flush()
+
 
 def HF_silde(*args):
     if int(MainWindow.HF_scale.get()) > int(MainWindow.LF_value.get()):
@@ -571,6 +566,7 @@ def HF_silde(*args):
         # for arg in args:
         #     print ('    another arg:', arg)
         sys.stdout.flush()
+
 
 def LF_silde(*args):
     if int(MainWindow.LF_scale.get()) < int(MainWindow.HF_value.get()):
@@ -586,17 +582,19 @@ def LF_silde(*args):
 
 
 def DispFusion_button_click(*args):
-#  ref: MainWindow.DispFusion_button.bind in main()
+    #  ref: MainWindow.DispFusion_button.bind in main()
     if _debug:
         print('RSS_GUI_main.DispFusion_button_click')
         for arg in args:
             print('	another arg:', arg)
         sys.stdout.flush()
 
+
 def choose_view():
     refresh_display(MainWindow.opt_var.get())
     # selection = "You selected the option " + str(MainWindow.opt_var.get())
     # MainWindow.View_label.config(text=selection)
+
 
 def DispASynSeg_button_click(*args):
     total_num = len(os.listdir('SynSegs/'))
@@ -610,7 +608,7 @@ def DispASynSeg_button_click(*args):
             if (USER_INP >= 1) and (USER_INP <= total_num):
 
                 truth_file = "truth_mask.png"
-                seg_file = "SynSegs/synseg_"+ str(USER_INP) +"_.png"
+                seg_file = "SynSegs/synseg_" + str(USER_INP) + "_.png"
                 MainWindow.opt_var.set(3)
                 MainWindow.ViewName.set("SynSeg " + str(USER_INP) + "/" + str(total_num))
                 sample_display(truth_file, seg_file)
@@ -618,7 +616,7 @@ def DispASynSeg_button_click(*args):
                 break
             else:
                 messagebox.showinfo(title="Error",
-                                    message="The SynSeg number must be in 1~"+str(total_num))
+                                    message="The SynSeg number must be in 1~" + str(total_num))
 
         else:  # click "cancel"
             break
@@ -626,15 +624,17 @@ def DispASynSeg_button_click(*args):
     if _debug:
         print('RSS_GUI_main.DispASynSeg_button_click')
         for arg in args:
-            print ('    another arg:', arg)
+            print('    another arg:', arg)
         sys.stdout.flush()
+
 
 def SynSegPivot_button_click(*args):
     if _debug:
         print('RSS_GUI_support.SynSegPivot_button_click')
         for arg in args:
-            print ('    another arg:', arg)
+            print('    another arg:', arg)
         sys.stdout.flush()
+
 
 def plot_dice(*args):
     Plot_res(SegCompare_1vN("T_mask.png", "SynSegs/", DICE),
@@ -643,8 +643,9 @@ def plot_dice(*args):
     if _debug:
         print('RSS_GUI_main.plot_dice')
         for arg in args:
-            print ('    another arg:', arg)
+            print('    another arg:', arg)
         sys.stdout.flush()
+
 
 def plot_hd(*args):
     Plot_res(SegCompare_1vN("T_mask.png", "SynSegs/", HD),
@@ -652,8 +653,9 @@ def plot_hd(*args):
     if _debug:
         print('RSS_GUI_main.plot_hd')
         for arg in args:
-            print ('    another arg:', arg)
+            print('    another arg:', arg)
         sys.stdout.flush()
+
 
 def plot_jac(*args):
     Plot_res(SegCompare_1vN("T_mask.png", "SynSegs/", JAC),
@@ -661,8 +663,9 @@ def plot_jac(*args):
     if _debug:
         print('RSS_GUI_main.plot_jac')
         for arg in args:
-            print ('    another arg:', arg)
+            print('    another arg:', arg)
         sys.stdout.flush()
+
 
 def plot_msi(*args):
     Plot_res(SegCompare_1vN("T_mask.png", "SynSegs/", MSI),
@@ -670,12 +673,12 @@ def plot_msi(*args):
     if _debug:
         print('RSS_GUI_main.plot_msi')
         for arg in args:
-            print ('    another arg:', arg)
+            print('    another arg:', arg)
         sys.stdout.flush()
 
 
 def show_res_seg(*args):
-    Fusion_MEAN(MaskFolder = MaskFolder4Fusion)
+    Fusion_MEAN(MaskFolder=MaskFolder4Fusion)
 
     img = cv2.imread("FusedMask_MEAN.png", cv2.IMREAD_GRAYSCALE)
     plt.imshow(img, cmap='gray')
@@ -684,8 +687,9 @@ def show_res_seg(*args):
     if _debug:
         print('RSS_GUI_main.show_res_seg')
         for arg in args:
-            print ('    another arg:', arg)
+            print('    another arg:', arg)
         sys.stdout.flush()
+
 
 def show_mv_seg(*args):
     Fusion_MV(MaskFolder=MaskFolder4Fusion)
@@ -699,8 +703,9 @@ def show_mv_seg(*args):
     if _debug:
         print('RSS_GUI_main.show_mv_seg')
         for arg in args:
-            print ('    another arg:', arg)
+            print('    another arg:', arg)
         sys.stdout.flush()
+
 
 def show_staple_seg(*args):
     Fusion_STAPLE(MaskFolder=MaskFolder4Fusion)
@@ -714,8 +719,9 @@ def show_staple_seg(*args):
     if _debug:
         print('RSS_GUI_main.show_staple_seg')
         for arg in args:
-            print ('    another arg:', arg)
+            print('    another arg:', arg)
         sys.stdout.flush()
+
 
 def show_tesd_seg(*args):
     Fusion_TESD(MaskFolder=MaskFolder4Fusion)
@@ -729,8 +735,9 @@ def show_tesd_seg(*args):
     if _debug:
         print('RSS_GUI_main.show_tesd_seg')
         for arg in args:
-            print ('    another arg:', arg)
+            print('    another arg:', arg)
         sys.stdout.flush()
+
 
 def SelectMode_Click(*args):
     if MainWindow.SelectMode_value.get():
@@ -741,7 +748,7 @@ def SelectMode_Click(*args):
     if _debug:
         # print('RSS_GUI_main.SelectMode_Click')
         for arg in args:
-            print ('    another arg:', arg)
+            print('    another arg:', arg)
         sys.stdout.flush()
 
 
@@ -754,6 +761,7 @@ def load_config(file_path):
             config_dict[item] = value
     return config_dict
 
+
 def UserFusion_button_click(*args):
     # Load the config file
     batch_config = load_config("batch_processing_config.txt")
@@ -763,10 +771,11 @@ def UserFusion_button_click(*args):
     # folder_in = "UserFusion_in/"
     # folder_out = "UserFusion_out/"
 
-    response =  tk.messagebox.askyesno("Batch Processing: User Fusion", "Masks in each sub-folder under the folder: " + folder_in
-                                     + "\t\t\t\t \n will be fused by different truthing methods and saved in the folder: "+ folder_out + ".\t\t\t\t \n Fused masks from the same sub-folder are in one folder. " +
-                                                                                    "\t\t\t\t \n To customize the input/output folders, please edit the <batch_processing_config.txt>. " +
-                                     "\t\t\t\t \n Changes will be applied next time. Continue? \t\t\t\t")
+    response = tk.messagebox.askyesno("Batch Processing: User Fusion",
+                                      "Masks in each sub-folder under the folder: " + folder_in
+                                      + "\t\t\t\t \n will be fused by different truthing methods and saved in the folder: " + folder_out + ".\t\t\t\t \n Fused masks from the same sub-folder are in one folder. " +
+                                      "\t\t\t\t \n To customize the input/output folders, please edit the <batch_processing_config.txt>. " +
+                                      "\t\t\t\t \n Changes will be applied next time. Continue? \t\t\t\t")
 
     if response:
         # User selected Yes
@@ -784,16 +793,14 @@ def UserFusion_button_click(*args):
 
             # print(fused_folder_path)
 
-
-            Fusion_MV(MaskFolder=folder_path, output_folder = fused_folder_path)
-            Fusion_STAPLE(MaskFolder=folder_path, output_folder = fused_folder_path)
-            Fusion_TESD(MaskFolder=folder_path, output_folder = fused_folder_path)
-
+            Fusion_MV(MaskFolder=folder_path, output_folder=fused_folder_path)
+            Fusion_STAPLE(MaskFolder=folder_path, output_folder=fused_folder_path)
+            Fusion_TESD(MaskFolder=folder_path, output_folder=fused_folder_path)
 
     if _debug:
         print('RSS_GUI_main.UserFusion_button_click')
         for arg in args:
-            print ('    another arg:', arg)
+            print('    another arg:', arg)
         sys.stdout.flush()
 
 
@@ -804,11 +811,11 @@ def UserFusion_button_click(*args):
 #             file.write(f"{item}={value}\n")
 def UserSyn_button_click(*args):
     global rndSeed
-    if rndSeed!=-1:
-        answer = tk.messagebox.askyesno("Random seed set = "+str(rndSeed),
-                                          "\t\t\t\t\nA random seed is set; generation results will be fixed and depended on the seed."  +
-                                          "\t\t\t\t \nTo change or remove the random seed, click <Seed> button."
-                                          "\t\t\t\t \nContinue? \t\t\t\t")
+    if rndSeed != -1:
+        answer = tk.messagebox.askyesno("Random seed = " + str(rndSeed),
+                                        "\t\t\t\t\nA random seed is fixed; the sequence of random values will be fixed and depended on the seed until the seed reset or the program restarted." +
+                                        "\t\t\t\t \nTo change or remove the random seed, click <Seed> button."
+                                        "\t\t\t\t \nContinue? \t\t\t\t")
         if answer == False:
             return
 
@@ -817,10 +824,16 @@ def UserSyn_button_click(*args):
     mask_folder = batch_config["UserSyn_mask_folder"]
     output_folder = batch_config["UserSyn_output_folder"]
 
-    response =  tk.messagebox.askyesno("Batch Processing: User Synthesis", "N (to be asked later) SynSegs will be generated from each original mask in the folder: " + mask_folder
-                                     + "\t\t\t\t \n and saved in the folder: "+ output_folder + ".\t\t\t\t \n SynSegs generated from the same original mask are in one folder. " +
-                                                                                    "\t\t\t\t \n To customize the input/output folders, please edit the <batch_processing_config.txt>. " +
-                                     "\t\t\t\t \n Changes will be applied next time. Continue? \t\t\t\t")
+    if MainWindow.SelectMode_value.get():
+        the_title = "Batch Processing: User Synthesis **in Selection Mode**"
+    else:
+        the_title = "Batch Processing: User Synthesis"
+
+    response = tk.messagebox.askyesno(the_title,
+                                      "N (to be asked later) SynSegs will be generated from each original mask in the folder: " + mask_folder
+                                      + "\t\t\t\t \n and saved in the folder: " + output_folder + ".\t\t\t\t \n SynSegs generated from the same original mask are in one folder. " +
+                                      "\t\t\t\t \n To customize the input/output folders, please edit the <batch_processing_config.txt>. " +
+                                      "\t\t\t\t \n Changes will be applied next time. Continue? \t\t\t\t")
 
     # mask_folder = "UserSyn_in/"
     # output_folder = "UserSyn_out/"
@@ -831,23 +844,42 @@ def UserSyn_button_click(*args):
     # # Save to file
     # save_config(file_path, configurations)
 
+    if MainWindow.SelectMode_value.get():
+        the_title_N = "Gen N SynSegs from every user's masks **in Selection Mode**"
+    else:
+        the_title_N = "Gen N SynSegs from every user's masks"
 
     if response:
         # User selected Yes
 
         while True:
-            USER_INP = simpledialog.askinteger(title="Gen N SynSegs from every user's masks",
-                                               prompt="Input the number of SynSegs (N) for generation:\t\t",
+            USER_INP = simpledialog.askinteger(title=the_title_N,
+                                               prompt="Input the number of SynSegs (N) for generation:\t\t\t\t\t\t",
                                                initialvalue=3)
             if USER_INP != None:  # not a None
 
                 if USER_INP > 0:
-                    mask_augmentation(mask_folder, output_folder, times=USER_INP,
-                                      l=int(MainWindow.LF_value.get()),
-                                      h=int(MainWindow.HF_value.get()),
-                                      sigma=float(MainWindow.Sigma_value.get()),
-                                      rndSeed = rndSeed)
-                    break
+
+                    if MainWindow.SelectMode_value.get():
+                        # Gen N **in Selection Mode**
+
+                        mask_augmentation_selet(mask_folder, output_folder, times=USER_INP,
+                                                l=int(MainWindow.LF_value.get()),
+                                                h=int(MainWindow.HF_value.get()),
+                                                sigma=float(MainWindow.Sigma_value.get()),
+                                                # Get the function object from globals() dictionary and call it
+                                                metric_func=globals()[MainWindow.Criterion_text.get()],
+                                                From=float(MainWindow.SelectFrom_value.get()),
+                                                To=float(MainWindow.SelectTo_value.get()))
+                        break
+
+                    else:
+                        mask_augmentation(mask_folder, output_folder, times=USER_INP,
+                                          l=int(MainWindow.LF_value.get()),
+                                          h=int(MainWindow.HF_value.get()),
+                                          sigma=float(MainWindow.Sigma_value.get()))
+                        break
+
                 else:
                     messagebox.showinfo(title="Error",
                                         message="The number cannot be smaller than 1")
@@ -855,11 +887,10 @@ def UserSyn_button_click(*args):
             else:  # click "cancel"
                 break
 
-
     if _debug:
         print('RSS_GUI_main.UserSyn_button_click')
         for arg in args:
-            print ('    another arg:', arg)
+            print('    another arg:', arg)
         sys.stdout.flush()
 
 
@@ -868,21 +899,24 @@ def Seed_button_click(*args):
     # print("before: "+ str(rndSeed))
 
     while True:
-        USER_INP = simpledialog.askinteger(title="Advanced function: set the random seed",
-                                           prompt="A reasonable seed must be an integer between 0 and (2^32 - 1). Only input -1 for no random seed. \nIf you set a random seed, generation results will be fixed and depended on the seed number.",
+        USER_INP = simpledialog.askinteger(title="Advanced function: set the fixed random seed",
+                                           prompt="A reasonable seed must be an integer between 0 and (2^32 - 1). Only input -1 for removing the fixed random seed. \nIf you set a fixed random seed, the sequence of random values will be reset, fixed, and depended on the seed number.",
                                            initialvalue=rndSeed)
         if USER_INP != None:  # check if click cancel
             if USER_INP != -1:  # not a None
-                if 0 <= USER_INP <= 2**32 - 1:  # in correct range?
+                if 0 <= USER_INP <= 2 ** 32 - 1:  # in correct range?
                     rndSeed = USER_INP
+                    np.random.seed(rndSeed)
+
                     break
                 else:
                     messagebox.showinfo(title="Error", message="Seed must be between 0 and (2^32 - 1).")
             else:
-                rndSeed = -1 # None - keep None
+                rndSeed = -1  # None - keep None
+                np.random.seed(None)
                 print("No random seed set.")
                 break
-        else: # click "cancel" - no change
+        else:  # click "cancel" - no change
             break
 
     # print("after: "+ str(rndSeed))
@@ -890,13 +924,9 @@ def Seed_button_click(*args):
     if _debug:
         print('RSS_GUI_main.Seed_button_click')
         for arg in args:
-            print ('    another arg:', arg)
+            print('    another arg:', arg)
         sys.stdout.flush()
+
 
 if __name__ == '__main__':
     RSS_GUI_layout.start_up()
-
-
-
-
-

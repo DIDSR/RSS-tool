@@ -7,6 +7,7 @@ from skimage import measure
 from skimage.morphology import square, dilation
 from scipy.ndimage import binary_fill_holes
 from tqdm import tqdm
+import tkinter as tk
 
 def FD_change(Fcode, l, h, sigma):
     Len = Fcode.shape[0]
@@ -145,12 +146,12 @@ def contour2mask(contour):
     return filled, eligible_flag
 
 
-def mask_augmentation(mask_folder, output_folder, times, l, h, sigma, rndSeed):
-
-    if rndSeed!=-1:
-        np.random.seed(rndSeed)
-    else:
-        np.random.seed(None)
+def mask_augmentation(mask_folder, output_folder, times, l, h, sigma):
+    #
+    # if rndSeed!=-1:
+    #     np.random.seed(rndSeed)
+    # else:
+    #     np.random.seed(None)
 
     for mask_file in tqdm(os.listdir(mask_folder)):
 
@@ -206,3 +207,80 @@ def mask_augmentation(mask_folder, output_folder, times, l, h, sigma, rndSeed):
 
 
                     print("Cannot create an eligible mask, tried " + str(try_times) + "/100 times.", end="\r", flush=True)
+
+
+def mask_augmentation_selet(mask_folder, output_folder, times, l, h, sigma, metric_func, From, To):
+
+    for mask_file in tqdm(os.listdir(mask_folder)):
+
+        name, ext = os.path.splitext(mask_file)
+        folder_name = f"{name}_syn"
+        folder_path = os.path.join(output_folder, folder_name)
+
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+        else:
+            shutil.rmtree(folder_path)
+            os.makedirs(folder_path)
+
+        mask_path = os.path.join(mask_folder, mask_file)
+        one_mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        one_mask = imbinarize(one_mask)  # binarize area image
+
+        inner_sigma = sigma
+
+        for i in range(1, times + 1):  # gen num SynSegs
+            try_times = 0
+            try_times_selet = 0
+
+            while True:
+                fd_code = bd2Fdesc(one_mask)
+                CFcode = FD_change(fd_code, l, h, inner_sigma)
+
+                re_img = Fdesc2bd(CFcode, one_mask.shape)
+                syn_img, eligible = contour2mask(re_img)
+
+                if eligible:
+                    try_times = 0
+                    # test for selection
+                    score = metric_func(one_mask, syn_img)
+
+                    if score > From and score < To:
+                        new_name = f"{name}_syn_{i}{ext}"
+                        new_aug_path = os.path.join(output_folder, folder_name, new_name)
+                        cv2.imwrite(new_aug_path, syn_img * 255)
+                        break
+
+                    else:  # try for selestion
+                        try_times_selet += 1
+                        if try_times_selet > 199:  # try 200 times
+                            print("Segmentation selection unsuccessful: cannot create a required mask for " + str(
+                                try_times_selet)
+                                  + " times trying in a least one round, need to set a different selection metric.")
+                            tk.messagebox.showwarning("Segmentation selection unsuccessful",
+                                                      "Cannot create a required mask for " + str(try_times_selet)
+                                                      + " times trying in a least one round, need to set a different selection metric.")
+                            return
+
+                        print("The mask is not in the selection, tried " + str(try_times_selet) +
+                              "/200 times or stop to set a different selection metric.", end="\r",
+                              flush=True)
+
+                else:
+                    try_times += 1
+                    if try_times > 99:  # try 100 times
+
+                        if inner_sigma < 0.0001:
+                            print("Task unsuccessful: cannot create an eligible mask for " + str(try_times)
+                                  + " times trying in a least one round, even using the sigma: " + str(inner_sigma))
+                            print("Input mask filename: " + mask_file)
+                            return
+
+                        inner_sigma = inner_sigma / 2
+                        print("Cannot create an eligible mask for " + str(try_times)
+                              + " times trying in a least one round, trying to set a smaller sigma: " + str(
+                            inner_sigma) + "\t")
+                        try_times = 0
+
+                    print("Cannot create an eligible mask, tried " + str(try_times) + "/100 times.", end="\r",
+                          flush=True)
