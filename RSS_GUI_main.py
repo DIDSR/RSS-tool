@@ -6,25 +6,15 @@
 #    Sep 18, 2024 05:17:04 PM EDT  platform: Linux
 #    Sep 18, 2024 05:32:22 PM EDT  platform: Linux
 #    Sep 20, 2024 12:19:46 PM EDT  platform: Linux
-from seg_measures import *
-from IPfunctions import *
-from LabelFusion import Fusion_TESD, Fusion_MV, Fusion_STAPLE, Fusion_MEAN
-
-import cv2
-import sys, os
-import tkinter as tk
-import numpy as np
-from IPfunctions import imbinarize
-import tkinter.ttk as ttk
-from tkinter.constants import *
-from PIL import Image, ImageTk, ImageGrab
+import sys
 from tkinter import simpledialog, messagebox, filedialog
-import matplotlib.pyplot as plt
-import shutil
-from tqdm import tqdm
-import SimpleITK as sitk
+from tkinter.constants import *
+from PIL import ImageTk
 
 import RSS_GUI_layout
+from IPfunctions import *
+from LabelFusion import Fusion_TESD, Fusion_MV, Fusion_STAPLE, Fusion_MEAN
+from seg_measures import *
 
 _debug = True  # False to eliminate debug printing from callback functions.
 
