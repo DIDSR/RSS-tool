@@ -206,7 +206,7 @@ class MainWin:
         self.SynSegPivot_button.configure(activebackground="#d9d9d9")
         self.SynSegPivot_button.configure(command=RSS_GUI_main.SynSegPivot_button_click)
         self.SynSegPivot_button.configure(font="-family {nimbus sans l} -size 9")
-        self.SynSegPivot_button.configure(text='''SynSegs Pivot''')
+        self.SynSegPivot_button.configure(text='''Metric Statistics''')
 
         self.DispASynSeg_button = tk.Button(self.top)
         self.DispASynSeg_button.place(x=0.613*w, y=0.033*h, height=29
