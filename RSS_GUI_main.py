@@ -889,8 +889,8 @@ def Seed_button_click(*args):
     # print("before: "+ str(rndSeed))
 
     while True:
-        USER_INP = simpledialog.askinteger(title="Advanced function: set the fixed random seed",
-                                           prompt="A reasonable seed must be an integer between 0 and (2^32 - 1). Only input -1 for removing the fixed random seed. \nIf you set a fixed random seed, the sequence of random values will be reset, fixed, and depended on the seed number.",
+        USER_INP = simpledialog.askinteger(title="Advanced function: set a random seed",
+                                           prompt="A seed must be an integer between 0 and (2^32 - 1). Input -1 for removing the fixed random seed. \nIf you set a fixed random seed, the sequence of random values will be deterministic and dependent on the seed number.",
                                            initialvalue=rndSeed)
         if USER_INP != None:  # check if click cancel
             if USER_INP != -1:  # not a None
