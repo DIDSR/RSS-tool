@@ -1,0 +1,6 @@
+Number: 10
+Sigma: 1.0
+Low frequency: 2
+High frequency: 10
+Random seed: N/A
+Selection Model: OFF

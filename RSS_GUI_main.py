@@ -459,9 +459,39 @@ def GenN_button_click(*args):
 
                         gen_synseg_selet(USER_INP, metric_func, From, To)
 
+                        if rndSeed != -1:
+                            RndS = rndSeed
+                        else:
+                            RndS = 'N/A'
+                        params = {
+                            'Number': USER_INP,
+                            'Sigma': float(MainWindow.Sigma_value.get()),
+                            'Low frequency': int(MainWindow.LF_value.get()),
+                            'High frequency': int(MainWindow.HF_value.get()),
+                            'Random seed': RndS,
+                            'Selection Model': 'ON',
+                            'Selection Metric': MainWindow.Criterion_text.get(),
+                            'Selection From': From,
+                            'Selection To': To
+                        }
+                        save_parameters('GanN_params', params)
 
                     else:
                         gen_synseg(USER_INP)
+
+                        if rndSeed != -1:
+                            RndS = rndSeed
+                        else:
+                            RndS = 'N/A'
+                        params = {
+                            'Number': USER_INP,
+                            'Sigma': float(MainWindow.Sigma_value.get()),
+                            'Low frequency': int(MainWindow.LF_value.get()),
+                            'High frequency': int(MainWindow.HF_value.get()),
+                            'Random seed': RndS,
+                            'Selection Model': 'OFF'
+                        }
+                        save_parameters('GanN_params', params)
 
                 break
             else:
@@ -751,6 +781,20 @@ def load_config(file_path):
             config_dict[item] = value
     return config_dict
 
+def save_parameters(filename, parameters):
+    from datetime import datetime
+
+    timestamp = datetime.now().strftime("%y%m%d-%H%M%S")
+    # Example output: {filename}_250811-143045.txt
+    filename = f"{filename}_{timestamp}.txt"
+    print(filename)
+
+    """Save parameters to a text file"""
+    with open(filename, 'w') as file:
+        for key, value in parameters.items():
+            file.write(f"{key}: {value}\n")
+
+
 
 def UserFusion_button_click(*args):
     # Load the config file
@@ -861,6 +905,23 @@ def UserSyn_button_click(*args):
                                                 metric_func=globals()[MainWindow.Criterion_text.get()],
                                                 From=float(MainWindow.SelectFrom_value.get()),
                                                 To=float(MainWindow.SelectTo_value.get()))
+                        if rndSeed != -1:
+                            RndS = rndSeed
+                        else:
+                            RndS = 'N/A'
+                        params = {
+                            'Number': USER_INP,
+                            'Sigma': float(MainWindow.Sigma_value.get()),
+                            'Low frequency': int(MainWindow.LF_value.get()),
+                            'High frequency': int(MainWindow.HF_value.get()),
+                            'Random seed': RndS,
+                            'Selection Model': 'ON',
+                            'Selection Metric': MainWindow.Criterion_text.get(),
+                            'Selection From': MainWindow.SelectFrom_value.get(),
+                            'Selection To': MainWindow.SelectTo_value.get()
+                        }
+                        save_parameters('UserSyn_params', params)
+
                         break
 
                     else:
@@ -868,6 +929,21 @@ def UserSyn_button_click(*args):
                                           l=int(MainWindow.LF_value.get()),
                                           h=int(MainWindow.HF_value.get()),
                                           sigma=float(MainWindow.Sigma_value.get()))
+
+                        if rndSeed != -1:
+                            RndS = rndSeed
+                        else:
+                            RndS = 'N/A'
+                        params = {
+                            'Number': USER_INP,
+                            'Sigma': float(MainWindow.Sigma_value.get()),
+                            'Low frequency': int(MainWindow.LF_value.get()),
+                            'High frequency': int(MainWindow.HF_value.get()),
+                            'Random seed': RndS,
+                            'Selection Model': 'OFF'
+                        }
+                        save_parameters('UserSyn_params', params)
+
                         break
 
                 else:
