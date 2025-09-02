@@ -60,7 +60,7 @@ If you find that `RSS-tool` is useful or if you use it in your project, please c
 
 
 ```
-https://github.com/DIDSR/RSS-tool
+https://didsr.github.io/RSS-tool/
 ```
 
 ```
