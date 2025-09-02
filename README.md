@@ -52,8 +52,7 @@ https://github.com/didsr/RSS-tool
   - Use `from <FileName> import <FunctionName>` in Python to include the functions into your codes.
   - Details of available functions can be found in the "The Use of Codes (Core Functions)" chapter in the **User's Manual: [Link](https://github.com/DIDSR/RSS-tool/blob/main/Restorable%20Segmentation%20Synthesis%20(RSS)%20Tool%20User%20Guide.pdf)**.
 
-## User's Manual: [Link](https://github.com/DIDSR/RSS-tool/blob/main/Restorable%20Segmentation%20Synthesis%20(RSS)%20Tool%20User%20Guide.pdf)*
-***It is a version for review and requires login and download. For the public version, it will be a HTML page.** 
+## User's Manual: [Link](https://didsr.github.io/RSS-tool/Restorable%20Segmentation%20Synthesis%20(RSS)%20Tool%20User%20Guide_PUB.html)*
 
 ## Cite this repository
 
