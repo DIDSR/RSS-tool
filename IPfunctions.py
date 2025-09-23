@@ -153,7 +153,16 @@ def mask_augmentation(mask_folder, output_folder, times, l, h, sigma):
     # else:
     #     np.random.seed(None)
 
+    run_report = {
+        'File name': [],
+        'Generation#': [],
+        'Note': []
+    }
+
     for mask_file in tqdm(os.listdir(mask_folder)):
+
+        Generated_Num = 0
+        Note = ""
 
         name, ext = os.path.splitext(mask_file)
         folder_name = f"{name}_syn"
@@ -171,42 +180,56 @@ def mask_augmentation(mask_folder, output_folder, times, l, h, sigma):
         
         inner_sigma = sigma
 
-        for i in range(1,times+1):  # gen num SynSegs
-            try_times = 0
-            
-            while True:
-                fd_code = bd2Fdesc(one_mask)
-                CFcode = FD_change(fd_code, l, h, inner_sigma)
+        run_report['File name'].append(name)
 
-                re_img = Fdesc2bd(CFcode, one_mask.shape)
-                syn_img, eligible = contour2mask(re_img)
+        try:
 
+            for i in range(1,times+1):  # gen num SynSegs
+                try_times = 0
 
+                while True:
+                    fd_code = bd2Fdesc(one_mask)
+                    CFcode = FD_change(fd_code, l, h, inner_sigma)
 
-                if eligible:
-                    new_name = f"{name}_syn_{i}{ext}"
-                    new_aug_path = os.path.join(output_folder, folder_name, new_name)
-                    cv2.imwrite(new_aug_path, syn_img * 255)
-
-                    break
-
-                else:
-                    try_times +=1
-                    if try_times>99:  # try 100 times
-
-                        if inner_sigma < 0.0001:
-                            print("Task unsuccessful: cannot create an eligible mask for " + str(try_times)
-                                  + " times trying in a least one round, even using the sigma: " + str(inner_sigma))
-                            print("Input mask filename: " + mask_file)
-                            return
-
-                        inner_sigma = inner_sigma / 2
-                        print("Cannot create an eligible mask for " + str(try_times)
-                              + " times trying in a least one round, trying to set a smaller sigma: " + str(inner_sigma) + "\t")
-                        try_times = 0
+                    re_img = Fdesc2bd(CFcode, one_mask.shape)
+                    syn_img, eligible = contour2mask(re_img)
 
 
-                    print("Cannot create an eligible mask, tried " + str(try_times) + "/100 times.", end="\r", flush=True)
+
+                    if eligible:
+                        new_name = f"{name}_syn_{i}{ext}"
+                        new_aug_path = os.path.join(output_folder, folder_name, new_name)
+                        cv2.imwrite(new_aug_path, syn_img * 255)
+                        Generated_Num += 1
+
+                        break
+
+                    else:
+                        try_times +=1
+                        if try_times>99:  # try 100 times
+
+                            if inner_sigma < 0.0001:
+                                print("Task unsuccessful: cannot create an eligible mask for " + str(try_times)
+                                      + " times trying in a least one round, even using the sigma: " + str(inner_sigma))
+                                print("Input mask filename: " + mask_file)
+                                # return
+                                break
+
+                            inner_sigma = inner_sigma / 2
+                            print("Cannot create an eligible mask for " + str(try_times)
+                                  + " times trying in a least one round, trying to set a smaller sigma: " + str(inner_sigma) + "\t")
+                            try_times = 0
+
+
+                        print("Cannot create an eligible mask, tried " + str(try_times) + "/100 times.", end="\r", flush=True)
+
+        except Exception as Err:
+            Note = Err
+
+        run_report['Generation#'].append(Generated_Num)
+        run_report['Note'].append(Note)
+
+    return run_report
 
 
 def mask_augmentation_selet(mask_folder, output_folder, times, l, h, sigma, metric_func, From, To):

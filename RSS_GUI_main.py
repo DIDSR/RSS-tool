@@ -10,6 +10,7 @@ import sys
 from tkinter import simpledialog, messagebox, filedialog
 from tkinter.constants import *
 from PIL import ImageTk
+import pandas as pd
 
 import RSS_GUI_layout
 from IPfunctions import *
@@ -474,7 +475,7 @@ def GenN_button_click(*args):
                             'Selection From': From,
                             'Selection To': To
                         }
-                        save_parameters('GanN_params', params)
+                        save_log('GanN_params', params)
 
                     else:
                         gen_synseg(USER_INP)
@@ -491,7 +492,7 @@ def GenN_button_click(*args):
                             'Random seed': RndS,
                             'Selection Model': 'OFF'
                         }
-                        save_parameters('GanN_params', params)
+                        save_log('GanN_params', params)
 
                 break
             else:
@@ -781,8 +782,9 @@ def load_config(file_path):
             config_dict[item] = value
     return config_dict
 
-def save_parameters(filename, parameters):
+def save_log(filename, parameters, run_report):
     from datetime import datetime
+    df = pd.DataFrame(run_report)
 
     timestamp = datetime.now().strftime("%y%m%d-%H%M%S")
     # Example output: {filename}_250811-143045.txt
@@ -793,6 +795,9 @@ def save_parameters(filename, parameters):
     with open(filename, 'w') as file:
         for key, value in parameters.items():
             file.write(f"{key}: {value}\n")
+        file.write("\n")
+        file.write("Running report:\n")
+        file.write(df.to_string(index=False))
 
 
 
@@ -920,12 +925,12 @@ def UserSyn_button_click(*args):
                             'Selection From': MainWindow.SelectFrom_value.get(),
                             'Selection To': MainWindow.SelectTo_value.get()
                         }
-                        save_parameters('UserSyn_params', params)
+                        save_log('UserSyn_params', params)
 
                         break
 
                     else:
-                        mask_augmentation(mask_folder, output_folder, times=USER_INP,
+                        run_report = mask_augmentation(mask_folder, output_folder, times=USER_INP,
                                           l=int(MainWindow.LF_value.get()),
                                           h=int(MainWindow.HF_value.get()),
                                           sigma=float(MainWindow.Sigma_value.get()))
@@ -942,7 +947,7 @@ def UserSyn_button_click(*args):
                             'Random seed': RndS,
                             'Selection Model': 'OFF'
                         }
-                        save_parameters('UserSyn_params', params)
+                        save_log('UserSyn_params', params, run_report)
 
                         break
 
