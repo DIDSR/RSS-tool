@@ -32,6 +32,7 @@ simpleitk~=2.1.1
 matplotlib~=3.4.3
 labelfusion~=1.0.14
 tqdm
+pandas
 ```
 
 ### Preparation
