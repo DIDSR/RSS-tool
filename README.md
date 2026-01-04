@@ -10,9 +10,9 @@ The RSS tool provides **image restorable segmentation synthesis functionality**.
 The RSS tool supports multiple activities by end users and AI developers including:
  - Investigating properties of segmentation performance metrics and informing segmentation metric selection.
  - Investigating truthing methods and informing truthing method selection by allowing users to assess the impact of different augmentation methods for combining multiple segmentation (truth) masked provided by a set of truthers.
- - Augmenting segmentation masks for improving training of AI segmentation models.
+ - Augmenting segmentation contours for generative AI models to potentially improve the training and robustness of AI models.
 
-The intended users of this RSS tool include AI segmentation algorithm developers and reviewers.  The clinical use cases include AI-based segmentation applied to Digital Pathology and Radiology image datasets.
+The clinical applications areas include the AI development/validation of medical imaging AI in domains such as Digital Pathology and Radiology imaging.
 
 ## Installation
 This section will help you to install the packages needed for `RSS-tool`.
