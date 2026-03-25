@@ -1,9 +1,0 @@
-Number: 10
-Sigma: 5.0
-Low frequency: 2
-High frequency: 10
-Random seed: 6
-Selection Model: ON
-Selection Metric: DICE
-Selection From: 0.93
-Selection To: 0.95
